@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project Discussion
 
-## Getting Started
+This project is built to help users monitor their DPDC electricity bills automatically.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Users can check their current DPDC electricity bill.
+- Every checked bill is stored in the database as history.
+- A scheduled cron job periodically checks for bill updates.
+- If the bill amount changes, the system automatically sends a notification to a Discord channel with the latest balance.
+- Prevents users from manually checking their bills repeatedly by providing automatic monitoring.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Workflow
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. A user checks their DPDC electricity bill.
+2. The bill information is saved for future comparison.
+3. A cron job runs at scheduled intervals.
+4. The latest bill is fetched from DPDC.
+5. The new bill is compared with the previously stored bill.
+6. If the balance has changed, a Discord notification is sent with the updated balance.
+7. If there is no change, no notification is sent.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Purpose
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The main goal of this project is to automate electricity bill monitoring and provide instant notifications whenever a bill is updated, making it easier for users to stay informed without checking manually.

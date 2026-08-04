@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import BillBarChart from "@/components/BarChart";
 import Link from "next/link";
+import Toast from "@/components/Toast";
 
 export default function Home() {
   const [customerNumber, setCustomerNumber] = useState("");
@@ -521,7 +522,13 @@ export default function Home() {
             </>
           )}
         </div>
-
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
         <footer className="text-center text-[0.55rem] text-gray-600 tracking-[0.2em] pt-4 border-t border-white/5">
           Developer Mursalin Hossain • DPDC BALANCE v1.0
         </footer>

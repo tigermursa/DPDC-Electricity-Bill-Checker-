@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import BillBarChart from "@/components/BarChart";
 import Link from "next/link";
 import Toast from "@/components/Toast";
+import Header from "@/components/Home/Header";
+import Footer from "@/components/Home/Footer";
 
 export default function Home() {
   const [customerNumber, setCustomerNumber] = useState("");
@@ -228,154 +230,140 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#08080e] py-6 px-4 md:py-10">
       <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
-        <div className="flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-bold tracking-wider bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              DPDC BALANCE
-            </h1>
-            <p className="text-gray-500 text-xs md:text-sm mt-1 tracking-[0.2em]">
-              ⚡ AUTO TOKEN • MONGODB HISTORY
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/history">
-              <button className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-400 hover:bg-white/10 transition">
-                📜 History
-              </button>
-            </Link>
-          </div>
-        </div>
+        <Header />
 
         {/* Search Section */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
-          <form
-            onSubmit={fetchBalance}
-            className="relative flex flex-col sm:flex-row gap-4"
-          >
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={customerNumber}
-                onChange={(e) => {
-                  setCustomerNumber(e.target.value);
-                  setShowSuggestions(e.target.value.length > 0);
-                }}
-                onFocus={() => setShowSuggestions(suggestions.length > 0)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                placeholder="Enter customer number"
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
-                disabled={loading}
-              />
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl z-10 max-h-48 overflow-y-auto">
-                  {suggestions.map((id) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => selectSuggestion(id)}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition"
-                    >
-                      {id}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <button
-              type="submit"
-              className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,212,255,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading}
+        <div className="">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl ">
+            <form
+              onSubmit={fetchBalance}
+              className="relative flex flex-col sm:flex-row gap-4"
             >
-              {loading ? "SCANNING..." : "🔍 SEARCH"}
-            </button>
-          </form>
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={customerNumber}
+                  onChange={(e) => {
+                    setCustomerNumber(e.target.value);
+                    setShowSuggestions(e.target.value.length > 0);
+                  }}
+                  onFocus={() => setShowSuggestions(suggestions.length > 0)}
+                  onBlur={() =>
+                    setTimeout(() => setShowSuggestions(false), 200)
+                  }
+                  placeholder="Enter customer number"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+                  disabled={loading}
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl z-10 max-h-48 overflow-y-auto">
+                    {suggestions.map((id) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => selectSuggestion(id)}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition"
+                      >
+                        {id}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,212,255,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading}
+              >
+                {loading ? "SCANNING..." : "🔍 SEARCH"}
+              </button>
+            </form>
 
-          {loading && (
-            <div className="flex flex-col items-center py-10">
-              <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
-              <p className="mt-4 text-cyan-400 text-xs tracking-[0.2em] animate-pulse">
-                FETCHING DATA
-              </p>
-            </div>
-          )}
-
-          {error && (
-            <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-center text-sm">
-              ⚠️ {error}
-            </div>
-          )}
-
-          {/* Data Display */}
-          {data && (
-            <div className="mt-6 space-y-6 animate-fadeIn">
-              <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500/20 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 rounded-3xl p-6 md:p-8 text-center backdrop-blur-sm">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-                <p className="text-gray-400 text-xs tracking-[0.3em] uppercase relative z-10">
-                  Available Balance
-                </p>
-                <p
-                  className={`text-5xl md:text-7xl font-bold relative z-10 mt-1 transition-all duration-300 ${getBalanceColor(animatedBalance)}`}
-                >
-                  {formatBalance(animatedBalance)}
+            {loading && (
+              <div className="flex flex-col items-center py-10">
+                <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+                <p className="mt-4 text-cyan-400 text-xs tracking-[0.2em] animate-pulse">
+                  FETCHING DATA
                 </p>
               </div>
+            )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {fields.map(({ key, label }) => {
-                  if (key === "balanceRemaining") return null;
-                  const value = data[key];
-                  if (key === "connectionStatus") {
+            {error && (
+              <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-center text-sm">
+                ⚠️ {error}
+              </div>
+            )}
+
+            {/* Data Display */}
+            {data && (
+              <div className="mt-6 space-y-6 animate-fadeIn">
+                <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500/20 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 rounded-3xl p-6 md:p-8 text-center backdrop-blur-sm">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+                  <p className="text-gray-400 text-xs tracking-[0.3em] uppercase relative z-10">
+                    Available Balance
+                  </p>
+                  <p
+                    className={`text-5xl md:text-7xl font-bold relative z-10 mt-1 transition-all duration-300 ${getBalanceColor(animatedBalance)}`}
+                  >
+                    {formatBalance(animatedBalance)}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {fields.map(({ key, label }) => {
+                    if (key === "balanceRemaining") return null;
+                    const value = data[key];
+                    if (key === "connectionStatus") {
+                      return (
+                        <div
+                          key={key}
+                          className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-4 flex items-center justify-between hover:bg-white/10 transition"
+                        >
+                          <span className="text-gray-400 text-xs uppercase tracking-wider">
+                            {label}
+                          </span>
+                          <span
+                            className={`px-4 py-1 rounded-full text-xs font-semibold ${
+                              value?.toLowerCase() === "active"
+                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                : "bg-red-500/20 text-red-400 border border-red-500/30"
+                            }`}
+                          >
+                            {value || "N/A"}
+                          </span>
+                        </div>
+                      );
+                    }
                     return (
                       <div
                         key={key}
-                        className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-4 flex items-center justify-between hover:bg-white/10 transition"
+                        className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-4 hover:bg-white/10 transition"
                       >
                         <span className="text-gray-400 text-xs uppercase tracking-wider">
                           {label}
                         </span>
-                        <span
-                          className={`px-4 py-1 rounded-full text-xs font-semibold ${
-                            value?.toLowerCase() === "active"
-                              ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                              : "bg-red-500/20 text-red-400 border border-red-500/30"
-                          }`}
-                        >
+                        <p className="text-white font-medium mt-1 text-sm md:text-base">
                           {value || "N/A"}
-                        </span>
+                        </p>
                       </div>
                     );
-                  }
-                  return (
-                    <div
-                      key={key}
-                      className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-4 hover:bg-white/10 transition"
-                    >
-                      <span className="text-gray-400 text-xs uppercase tracking-wider">
-                        {label}
-                      </span>
-                      <p className="text-white font-medium mt-1 text-sm md:text-base">
-                        {value || "N/A"}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+                  })}
+                </div>
 
-              <div className="flex justify-end">
-                <button
-                  onClick={fetchBalance}
-                  disabled={loading}
-                  className="text-xs text-gray-500 hover:text-cyan-400 transition tracking-[0.15em] disabled:opacity-40"
-                >
-                  ⟳ REFRESH
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    onClick={fetchBalance}
+                    disabled={loading}
+                    className="text-xs text-gray-500 hover:text-cyan-400 transition tracking-[0.15em] disabled:opacity-40"
+                  >
+                    ⟳ REFRESH
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-
-        {/* Subscription Section */}
 
         {/* Subscription Section */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
@@ -529,9 +517,7 @@ export default function Home() {
             onClose={() => setToast(null)}
           />
         )}
-        <footer className="text-center text-[0.55rem] text-gray-600 tracking-[0.2em] pt-4 border-t border-white/5">
-          Developer Mursalin Hossain • DPDC BALANCE v1.0
-        </footer>
+        <Footer />
       </div>
     </main>
   );

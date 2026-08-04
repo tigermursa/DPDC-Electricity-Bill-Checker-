@@ -62,23 +62,23 @@ export async function sendWeeklyBillEmail({
 
         <div class="bill-box">
           <div class="bill-row">
-            <span class="label">👤 Customer</span>
+            <span class="label"> Customer</span>
             <span class="value">${customerName || customerNumber}</span>
           </div>
           <div class="bill-row">
-            <span class="label">🆔 Account</span>
+            <span class="label"> Account</span>
             <span class="value">${customerNumber}</span>
           </div>
           <div class="bill-row">
-            <span class="label">📉 Last Week Bill</span>
+            <span class="label"> Last Week Bill</span>
             <span class="value ${lastWeekBill >= 0 ? "green" : "red"}">৳ ${lastWeekBill.toFixed(2)}</span>
           </div>
           <div class="bill-row">
-            <span class="label">📈 Current Bill</span>
+            <span class="label">Current Bill</span>
             <span class="value ${currentBill >= 0 ? "green" : "red"}">৳ ${currentBill.toFixed(2)}</span>
           </div>
           <div class="bill-row" style="border-top: 2px solid #00d4ff; margin-top: 5px; padding-top: 12px;">
-            <span class="label">💰 Change</span>
+            <span class="label"> Change</span>
             <span class="value ${currentBill - lastWeekBill >= 0 ? "red" : "green"}">
               ${currentBill - lastWeekBill >= 0 ? "+" : ""}${(currentBill - lastWeekBill).toFixed(2)}
             </span>
@@ -86,13 +86,13 @@ export async function sendWeeklyBillEmail({
         </div>
 
         <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #888;">
-          📊 This is your weekly DPDC bill update.<br>
-          Check your latest balance anytime at <span class="highlight">${process.env.NEXT_PUBLIC_APP_URL || "your app"}</span>
+          This is your weekly DPDC bill update.<br>
+          Check your latest balance anytime at <span class="highlight">${process.env.NEXT_PUBLIC_APP_URL || "https://my-bill-two.vercel.app"}</span>
         </div>
 
         <div class="footer">
-          DPDC Bill Tracker • Powered by Next.js<br>
-          This is an automated weekly report.
+          Developed by Mursalin Hossain<br>
+          
         </div>
       </div>
     </body>

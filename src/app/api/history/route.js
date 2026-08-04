@@ -1,5 +1,5 @@
+import { Bill, connectToDatabase } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { connectToDatabase, Bill } from "@/lib/db";
 
 export async function GET(request) {
   try {

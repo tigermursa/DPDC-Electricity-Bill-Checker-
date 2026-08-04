@@ -1,16 +1,55 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import BillBarChart from "@/components/BarChart";
+import Link from "next/link";
 
 export default function Home() {
-  const [customerNumber, setCustomerNumber] = useState("35100879");
+  const [customerNumber, setCustomerNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [animatedBalance, setAnimatedBalance] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Email subscription state
+  const [email, setEmail] = useState("");
+  const [subscribeLoading, setSubscribeLoading] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState(null);
+  const [subscribeError, setSubscribeError] = useState(null);
+  const [showSubscribeForm, setShowSubscribeForm] = useState(false);
+
+  // localStorage থেকে সাজেশন লোড
+  useEffect(() => {
+    const saved = localStorage.getItem("dpdc_searched_ids");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setSuggestions(parsed.slice(0, 5));
+        if (parsed.length > 0) {
+          setCustomerNumber(parsed[0]);
+        }
+      } catch (e) {
+        console.error("Failed to load suggestions", e);
+      }
+    }
+  }, []);
+
+  const updateSuggestions = (newId) => {
+    if (!newId.trim()) return;
+    const updated = [
+      newId.trim(),
+      ...suggestions.filter((id) => id !== newId.trim()),
+    ];
+    const limited = updated.slice(0, 5);
+    setSuggestions(limited);
+    localStorage.setItem("dpdc_searched_ids", JSON.stringify(limited));
+  };
 
   const fetchHistory = async (number) => {
     setHistoryLoading(true);
@@ -35,30 +74,38 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (customerNumber.trim()) fetchHistory(customerNumber.trim());
+    if (customerNumber.trim()) {
+      fetchHistory(customerNumber.trim());
+    }
   }, []);
 
   const fetchBalance = async (e) => {
     e.preventDefault();
-    if (!customerNumber.trim()) {
+    const trimmed = customerNumber.trim();
+    if (!trimmed) {
       setError("Please enter a customer number");
       return;
     }
+
+    updateSuggestions(trimmed);
+
     setLoading(true);
     setError(null);
     setData(null);
+    setAnimatedBalance(0);
+    setIsAnimating(false);
 
     try {
       const res = await fetch("/api/balance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerNumber: customerNumber.trim() }),
+        body: JSON.stringify({ customerNumber: trimmed }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Something went wrong");
       if (result.data) {
         setData(result.data);
-        await fetchHistory(customerNumber.trim());
+        await fetchHistory(trimmed);
       } else {
         throw new Error("No data received");
       }
@@ -69,11 +116,86 @@ export default function Home() {
     }
   };
 
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!email.trim() || !customerNumber.trim()) {
+      setSubscribeError("Please enter both customer number and email");
+      return;
+    }
+
+    setSubscribeLoading(true);
+    setSubscribeError(null);
+    setSubscribeMessage(null);
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerNumber: customerNumber.trim(),
+          email: email.trim(),
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || "Subscription failed");
+      }
+
+      setSubscribeMessage(result.message);
+      setSubscribeError(null);
+      setEmail("");
+      setTimeout(() => setSubscribeMessage(null), 5000);
+    } catch (err) {
+      setSubscribeError(err.message);
+      setSubscribeMessage(null);
+    } finally {
+      setSubscribeLoading(false);
+    }
+  };
+
+  // Balance animation
+  useEffect(() => {
+    if (data && !isAnimating) {
+      const target = parseFloat(data.balanceRemaining);
+      if (!isNaN(target)) {
+        setIsAnimating(true);
+        let start = 0;
+        const duration = 1200;
+        const startTime = Date.now();
+
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 2);
+          const current = start + (target - start) * eased;
+          setAnimatedBalance(current);
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            setAnimatedBalance(target);
+            setIsAnimating(false);
+          }
+        };
+        animate();
+      }
+    }
+  }, [data]);
+
   const formatBalance = (value) => {
     if (value === null || value === undefined) return "N/A";
-    const num = parseFloat(value);
+    const num = typeof value === "number" ? value : parseFloat(value);
     if (isNaN(num)) return value;
     return `৳ ${num.toFixed(2)}`;
+  };
+
+  const getBalanceColor = (value) => {
+    const num = typeof value === "number" ? value : parseFloat(value);
+    if (isNaN(num)) return "text-gray-400";
+    return num >= 100
+      ? "text-green-400 drop-shadow-[0_0_20px_rgba(0,255,136,0.4)]"
+      : "text-red-400 drop-shadow-[0_0_20px_rgba(255,0,68,0.4)]";
   };
 
   const formatDate = (dateString) => {
@@ -96,6 +218,11 @@ export default function Home() {
     { key: "connectionStatus", label: "Status" },
   ];
 
+  const selectSuggestion = (id) => {
+    setCustomerNumber(id);
+    setShowSuggestions(false);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#08080e] py-6 px-4 md:py-10">
       <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
@@ -109,22 +236,50 @@ export default function Home() {
               ⚡ AUTO TOKEN • MONGODB HISTORY
             </p>
           </div>
+          <div className="flex gap-3">
+            <Link href="/history">
+              <button className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-400 hover:bg-white/10 transition">
+                📜 History
+              </button>
+            </Link>
+          </div>
         </div>
 
         {/* Search Section */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
           <form
             onSubmit={fetchBalance}
-            className="flex flex-col sm:flex-row gap-4"
+            className="relative flex flex-col sm:flex-row gap-4"
           >
-            <input
-              type="text"
-              value={customerNumber}
-              onChange={(e) => setCustomerNumber(e.target.value)}
-              placeholder="Enter customer number"
-              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
-              disabled={loading}
-            />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={customerNumber}
+                onChange={(e) => {
+                  setCustomerNumber(e.target.value);
+                  setShowSuggestions(e.target.value.length > 0);
+                }}
+                onFocus={() => setShowSuggestions(suggestions.length > 0)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Enter customer number"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+                disabled={loading}
+              />
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl z-10 max-h-48 overflow-y-auto">
+                  {suggestions.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => selectSuggestion(id)}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition"
+                    >
+                      {id}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               type="submit"
               className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,212,255,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -158,8 +313,10 @@ export default function Home() {
                 <p className="text-gray-400 text-xs tracking-[0.3em] uppercase relative z-10">
                   Available Balance
                 </p>
-                <p className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent relative z-10 mt-1">
-                  {formatBalance(data.balanceRemaining)}
+                <p
+                  className={`text-5xl md:text-7xl font-bold relative z-10 mt-1 transition-all duration-300 ${getBalanceColor(animatedBalance)}`}
+                >
+                  {formatBalance(animatedBalance)}
                 </p>
               </div>
 
@@ -217,6 +374,72 @@ export default function Home() {
           )}
         </div>
 
+        {/* Subscription Section */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
+          <h2 className="text-xl font-bold text-cyan-400 mb-4 tracking-wider">
+            📧 Weekly Email Report
+          </h2>
+          <p className="text-gray-400 text-sm mb-4">
+            Get your DPDC bill update every Friday via email.
+          </p>
+
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const form = e.target;
+              const email = form.email.value;
+              const number = form.customerNumber.value;
+
+              if (!number || !email) {
+                alert("Please fill in both fields");
+                return;
+              }
+
+              setLoading(true);
+              try {
+                const res = await fetch("/api/subscribe", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ customerNumber: number, email }),
+                });
+                const result = await res.json();
+                if (res.ok) {
+                  alert(result.message || "Subscription successful!");
+                  form.reset();
+                } else {
+                  alert(result.error || "Subscription failed");
+                }
+              } catch (err) {
+                alert("Network error. Please try again.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="flex flex-col sm:flex-row gap-4"
+          >
+            <input
+              type="text"
+              name="customerNumber"
+              placeholder="Customer Number"
+              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+              required
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition"
+              disabled={loading}
+            >
+              {loading ? "SUBMITTING..." : "📧 SUBSCRIBE"}
+            </button>
+          </form>
+        </div>
         {/* History & Chart */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
           <h2 className="text-xl font-bold text-cyan-400 mb-4 tracking-wider">

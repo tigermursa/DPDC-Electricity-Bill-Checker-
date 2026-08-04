@@ -17,7 +17,7 @@ export async function connectToDatabase() {
     console.warn(
       "⚠️ MongoDB URI not configured. Skipping database connection.",
     );
-    return null; // অথবা throw করবেন না, তবে API route-এ check করে নেবেন
+    return null;
   }
 
   if (cached.conn) return cached.conn;
@@ -26,7 +26,7 @@ export async function connectToDatabase() {
     cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000, // timeout কমিয়ে দিলাম
+      serverSelectionTimeoutMS: 5000,
     });
   }
   cached.conn = await cached.promise;
@@ -34,7 +34,7 @@ export async function connectToDatabase() {
   return cached.conn;
 }
 
-// Schema & Model (এখানেও কোনো error throw করবে না)
+// Bill Schema (আগের মতো)
 const BillSchema = new mongoose.Schema({
   customerNumber: { type: String, required: true, index: true },
   balance: { type: Number, required: true },
@@ -44,3 +44,16 @@ const BillSchema = new mongoose.Schema({
 });
 
 export const Bill = mongoose.models.Bill || mongoose.model("Bill", BillSchema);
+
+// Subscriber Schema
+const SubscriberSchema = new mongoose.Schema({
+  customerNumber: { type: String, required: true, index: true },
+  email: { type: String, required: true },
+  customerName: String,
+  subscribedAt: { type: Date, default: Date.now },
+  lastSentAt: Date,
+  isActive: { type: Boolean, default: true },
+});
+
+export const Subscriber =
+  mongoose.models.Subscriber || mongoose.model("Subscriber", SubscriberSchema);

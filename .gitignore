@@ -43,3 +43,6 @@ bun.lock
 package.json
 package-lock.json
 next.config.mjs
+postcss.config.mjs
+jsconfig.json
+eslint.config.mjs

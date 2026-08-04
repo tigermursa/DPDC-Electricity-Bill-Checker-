@@ -23,7 +23,7 @@ export default function Home() {
   const [subscribeMessage, setSubscribeMessage] = useState(null);
   const [subscribeError, setSubscribeError] = useState(null);
   const [showSubscribeForm, setShowSubscribeForm] = useState(false);
-
+  const [toast, setToast] = useState(null);
   // localStorage থেকে সাজেশন লোড
   useEffect(() => {
     const saved = localStorage.getItem("dpdc_searched_ids");
@@ -375,6 +375,8 @@ export default function Home() {
         </div>
 
         {/* Subscription Section */}
+
+        {/* Subscription Section */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
           <h2 className="text-xl font-bold text-cyan-400 mb-4 tracking-wider">
             📧 Weekly Email Report
@@ -391,7 +393,10 @@ export default function Home() {
               const number = form.customerNumber.value;
 
               if (!number || !email) {
-                alert("Please fill in both fields");
+                setToast({
+                  message: "Please fill in both fields",
+                  type: "error",
+                });
                 return;
               }
 
@@ -404,13 +409,22 @@ export default function Home() {
                 });
                 const result = await res.json();
                 if (res.ok) {
-                  alert(result.message || "Subscription successful!");
+                  setToast({
+                    message: result.message || "Subscription successful! ✅",
+                    type: "success",
+                  });
                   form.reset();
                 } else {
-                  alert(result.error || "Subscription failed");
+                  setToast({
+                    message: result.error || "Subscription failed",
+                    type: "error",
+                  });
                 }
               } catch (err) {
-                alert("Network error. Please try again.");
+                setToast({
+                  message: "Network error. Please try again.",
+                  type: "error",
+                });
               } finally {
                 setLoading(false);
               }
@@ -433,13 +447,14 @@ export default function Home() {
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition"
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition disabled:opacity-50"
               disabled={loading}
             >
               {loading ? "SUBMITTING..." : "📧 SUBSCRIBE"}
             </button>
           </form>
         </div>
+
         {/* History & Chart */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
           <h2 className="text-xl font-bold text-cyan-400 mb-4 tracking-wider">

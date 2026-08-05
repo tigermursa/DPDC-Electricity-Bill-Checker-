@@ -20,14 +20,13 @@ export default function Home() {
   const [animatedBalance, setAnimatedBalance] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Email subscription state
   const [email, setEmail] = useState("");
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeMessage, setSubscribeMessage] = useState(null);
   const [subscribeError, setSubscribeError] = useState(null);
   const [showSubscribeForm, setShowSubscribeForm] = useState(false);
   const [toast, setToast] = useState(null);
-  // localStorage থেকে সাজেশন লোড
+
   useEffect(() => {
     const saved = localStorage.getItem("dpdc_searched_ids");
     if (saved) {
@@ -157,7 +156,6 @@ export default function Home() {
     }
   };
 
-  // Balance animation
   useEffect(() => {
     if (data && !isAnimating) {
       const target = parseFloat(data.balanceRemaining);
@@ -195,10 +193,10 @@ export default function Home() {
 
   const getBalanceColor = (value) => {
     const num = typeof value === "number" ? value : parseFloat(value);
-    if (isNaN(num)) return "text-gray-400";
+    if (isNaN(num)) return "text-gray-500";
     return num >= 100
-      ? "text-green-400 drop-shadow-[0_0_20px_rgba(0,255,136,0.4)]"
-      : "text-red-400 drop-shadow-[0_0_20px_rgba(255,0,68,0.4)]";
+      ? "text-[#33ff9c] drop-shadow-[0_0_18px_rgba(51,255,156,0.55)]"
+      : "text-[#ff5555] drop-shadow-[0_0_18px_rgba(255,85,85,0.55)]";
   };
 
   const formatDate = (dateString) => {
@@ -227,151 +225,172 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#08080e] py-6 px-4 md:py-10">
-      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
-        {/* Header */}
+    <main className="min-h-screen bg-[#070b0a] py-6 px-4 md:py-12 relative overflow-hidden">
+      {/* circuit dot texture */}
+      <div
+        className="fixed inset-0 opacity-40 pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(201,121,60,0.08) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      <div className="fixed top-0 left-1/3 w-96 h-96 bg-[#33ff9c]/[0.04] rounded-full blur-[130px] pointer-events-none"></div>
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-[#c9793c]/[0.05] rounded-full blur-[130px] pointer-events-none"></div>
+
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 relative z-10">
         <Header />
 
         {/* Search Section */}
-        <div className="">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl ">
-            <form
-              onSubmit={fetchBalance}
-              className="relative flex flex-col sm:flex-row gap-4"
-            >
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={customerNumber}
-                  onChange={(e) => {
-                    setCustomerNumber(e.target.value);
-                    setShowSuggestions(e.target.value.length > 0);
-                  }}
-                  onFocus={() => setShowSuggestions(suggestions.length > 0)}
-                  onBlur={() =>
-                    setTimeout(() => setShowSuggestions(false), 200)
-                  }
-                  placeholder="Enter customer number"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
-                  disabled={loading}
-                />
-                {showSuggestions && suggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl z-10 max-h-48 overflow-y-auto">
-                    {suggestions.map((id) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => selectSuggestion(id)}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition"
-                      >
-                        {id}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,212,255,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+        <div className="bg-[#0e1512]/80 backdrop-blur-xl border border-[#c9793c]/10 rounded-3xl p-5 md:p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+          <label className="block text-[0.65rem] text-[#5a9a7a] tracking-[0.25em] uppercase font-mono mb-2">
+            Meter Number
+          </label>
+          <form
+            onSubmit={fetchBalance}
+            className="relative flex flex-col sm:flex-row gap-4"
+          >
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={customerNumber}
+                onChange={(e) => {
+                  setCustomerNumber(e.target.value);
+                  setShowSuggestions(e.target.value.length > 0);
+                }}
+                onFocus={() => setShowSuggestions(suggestions.length > 0)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="e.g. 1234567"
+                className="w-full bg-[#050807] border border-[#c9793c]/20 rounded-xl px-5 py-3.5 text-[#d8ffe8] font-mono tracking-wider placeholder:text-[#3a453f] outline-none focus:border-[#33ff9c]/50 focus:ring-2 focus:ring-[#33ff9c]/10 transition-all"
                 disabled={loading}
-              >
-                {loading ? "SCANNING..." : "🔍 SEARCH"}
-              </button>
-            </form>
-
-            {loading && (
-              <div className="flex flex-col items-center py-10">
-                <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
-                <p className="mt-4 text-cyan-400 text-xs tracking-[0.2em] animate-pulse">
-                  FETCHING DATA
-                </p>
-              </div>
-            )}
-
-            {error && (
-              <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-center text-sm">
-                ⚠️ {error}
-              </div>
-            )}
-
-            {/* Data Display */}
-            {data && (
-              <div className="mt-6 space-y-6 animate-fadeIn">
-                <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500/20 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 rounded-3xl p-6 md:p-8 text-center backdrop-blur-sm">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-                  <p className="text-gray-400 text-xs tracking-[0.3em] uppercase relative z-10">
-                    Available Balance
-                  </p>
-                  <p
-                    className={`text-5xl md:text-7xl font-bold relative z-10 mt-1 transition-all duration-300 ${getBalanceColor(animatedBalance)}`}
-                  >
-                    {formatBalance(animatedBalance)}
-                  </p>
+              />
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0e1512] border border-[#c9793c]/20 rounded-xl shadow-2xl z-10 max-h-48 overflow-y-auto">
+                  {suggestions.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => selectSuggestion(id)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#9aab9f] hover:bg-[#33ff9c]/10 hover:text-[#33ff9c] transition-colors font-mono"
+                    >
+                      {id}
+                    </button>
+                  ))}
                 </div>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="px-8 py-3.5 bg-gradient-to-r from-[#c9793c] to-[#a85e28] rounded-xl font-bold text-[#0a0806] tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(201,121,60,0.4)] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+              disabled={loading}
+            >
+              {loading ? "READING..." : "READ METER"}
+            </button>
+          </form>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {fields.map(({ key, label }) => {
-                    if (key === "balanceRemaining") return null;
-                    const value = data[key];
-                    if (key === "connectionStatus") {
-                      return (
-                        <div
-                          key={key}
-                          className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-4 flex items-center justify-between hover:bg-white/10 transition"
-                        >
-                          <span className="text-gray-400 text-xs uppercase tracking-wider">
-                            {label}
-                          </span>
-                          <span
-                            className={`px-4 py-1 rounded-full text-xs font-semibold ${
-                              value?.toLowerCase() === "active"
-                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                                : "bg-red-500/20 text-red-400 border border-red-500/30"
-                            }`}
-                          >
-                            {value || "N/A"}
-                          </span>
-                        </div>
-                      );
-                    }
-                    return (
-                      <div
-                        key={key}
-                        className="bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-4 hover:bg-white/10 transition"
-                      >
-                        <span className="text-gray-400 text-xs uppercase tracking-wider">
-                          {label}
-                        </span>
-                        <p className="text-white font-medium mt-1 text-sm md:text-base">
-                          {value || "N/A"}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
+          {loading && (
+            <div className="flex flex-col items-center py-12">
+              <div className="relative w-12 h-12">
+                <div className="absolute inset-0 border-4 border-[#33ff9c]/10 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-transparent border-t-[#33ff9c] rounded-full animate-spin"></div>
+              </div>
+              <p className="mt-4 text-[#33ff9c] text-xs tracking-[0.25em] font-mono animate-pulse">
+                CONNECTING TO GRID
+              </p>
+            </div>
+          )}
 
-                <div className="flex justify-end">
-                  <button
-                    onClick={fetchBalance}
-                    disabled={loading}
-                    className="text-xs text-gray-500 hover:text-cyan-400 transition tracking-[0.15em] disabled:opacity-40"
-                  >
-                    ⟳ REFRESH
-                  </button>
+          {error && (
+            <div className="mt-6 p-4 bg-[#2a0d0d] border border-[#ff4d4d]/25 rounded-xl text-[#ff8080] text-center text-sm font-mono">
+              ⚠ {error}
+            </div>
+          )}
+
+          {/* Meter faceplate */}
+          {data && (
+            <div className="mt-6 space-y-6 animate-fadeIn">
+              <div className="relative rounded-[28px] p-[3px] bg-gradient-to-b from-[#3a2a1a] via-[#1a1410] to-[#0a0806] shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+                <div className="relative rounded-[25px] bg-gradient-to-b from-[#141110] to-[#0a0908] p-6 md:p-8 overflow-hidden">
+                  <span className="absolute top-3 left-3 w-2 h-2 rounded-full bg-[#3a2f24] shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]"></span>
+                  <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#3a2f24] shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]"></span>
+                  <span className="absolute bottom-3 left-3 w-2 h-2 rounded-full bg-[#3a2f24] shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]"></span>
+                  <span className="absolute bottom-3 right-3 w-2 h-2 rounded-full bg-[#3a2f24] shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]"></span>
+
+                  <div className="flex items-center justify-between text-[0.6rem] text-[#8a7a5a] tracking-[0.2em] mb-4 font-mono uppercase">
+                    <span>DPDC · Prepaid</span>
+                    <span className="flex items-center gap-1.5">
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          data.connectionStatus?.toLowerCase() === "active"
+                            ? "bg-[#33ff9c] animate-pulse shadow-[0_0_8px_#33ff9c]"
+                            : "bg-[#ff4d4d]"
+                        }`}
+                      />
+                      {data.connectionStatus || "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="relative rounded-xl bg-[#03100b] border border-[#0f2a1e] px-4 py-8 md:py-10 overflow-hidden">
+                    <div
+                      className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                      style={{
+                        backgroundImage:
+                          "repeating-linear-gradient(0deg, #000 0px, #000 1px, transparent 1px, transparent 3px)",
+                      }}
+                    ></div>
+                    <p className="text-center text-[0.6rem] text-[#2f7a55] tracking-[0.4em] uppercase font-mono mb-2 relative z-10">
+                      Available Balance
+                    </p>
+                    <p
+                      className={`text-center font-mono font-bold text-5xl md:text-7xl tracking-wide relative z-10 transition-all duration-300 ${getBalanceColor(animatedBalance)}`}
+                    >
+                      {formatBalance(animatedBalance)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {fields.map(({ key, label }) => {
+                  if (key === "balanceRemaining" || key === "connectionStatus")
+                    return null;
+                  const value = data[key];
+                  return (
+                    <div
+                      key={key}
+                      className="bg-[#0e1512]/60 border border-[#c9793c]/10 rounded-xl p-4 hover:bg-[#0e1512] hover:border-[#c9793c]/25 transition-all"
+                    >
+                      <span className="text-[#5a6a63] text-xs uppercase tracking-wider font-mono">
+                        {label}
+                      </span>
+                      <p className="text-[#d8e8dc] font-medium mt-1 text-sm md:text-base">
+                        {value || "N/A"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={fetchBalance}
+                  disabled={loading}
+                  className="text-xs text-[#5a6a63] hover:text-[#33ff9c] transition tracking-[0.15em] disabled:opacity-40 font-mono"
+                >
+                  ⟳ REFRESH
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Subscription Section */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
-          <h2 className="text-xl font-bold text-cyan-400 mb-4 tracking-wider">
-            📧 Weekly Email Report
+        <div className="bg-[#0e1512]/80 backdrop-blur-xl border border-[#c9793c]/10 rounded-3xl p-5 md:p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+          <h2 className="text-lg font-bold text-[#c9793c] mb-1.5 tracking-wider font-mono uppercase">
+            ⚡ Weekly Alert Relay
           </h2>
-          <p className="text-gray-400 text-sm mb-4">
-            Get your DPDC bill update every Friday via email.
+          <p className="text-[#5a6a63] text-sm mb-5">
+            Get your balance reading every Friday, delivered to your inbox.
           </p>
 
           <form
@@ -423,63 +442,66 @@ export default function Home() {
             <input
               type="text"
               name="customerNumber"
-              placeholder="Customer Number"
-              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+              placeholder="Meter Number"
+              className="flex-1 bg-[#050807] border border-[#c9793c]/20 rounded-xl px-5 py-3 text-[#d8ffe8] font-mono placeholder:text-[#3a453f] outline-none focus:border-[#33ff9c]/50 focus:ring-2 focus:ring-[#33ff9c]/10 transition-all"
               required
             />
             <input
               type="email"
               name="email"
-              placeholder="Your Email"
-              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white placeholder:text-gray-500 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+              placeholder="Email address"
+              className="flex-1 bg-[#050807] border border-[#c9793c]/20 rounded-xl px-5 py-3 text-[#d8ffe8] font-mono placeholder:text-[#3a453f] outline-none focus:border-[#33ff9c]/50 focus:ring-2 focus:ring-[#33ff9c]/10 transition-all"
               required
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl font-bold text-white tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition disabled:opacity-50"
+              className="px-6 py-3 bg-gradient-to-r from-[#c9793c] to-[#a85e28] rounded-xl font-bold text-[#0a0806] tracking-wider hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(201,121,60,0.35)] active:scale-[0.98] transition-all disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? "SUBMITTING..." : "📧 SUBSCRIBE"}
+              {loading ? "SAVING..." : "SUBSCRIBE"}
             </button>
           </form>
         </div>
 
         {/* History & Chart */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-3xl p-5 md:p-8 shadow-2xl">
-          <h2 className="text-xl font-bold text-cyan-400 mb-4 tracking-wider">
-            📊 Bill History & Chart
+        <div className="bg-[#0e1512]/80 backdrop-blur-xl border border-[#c9793c]/10 rounded-3xl p-5 md:p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+          <h2 className="text-lg font-bold text-[#c9793c] mb-4 tracking-wider font-mono uppercase">
+            ▤ Reading Log
           </h2>
 
           {historyLoading ? (
-            <div className="flex justify-center py-10">
-              <div className="w-10 h-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+            <div className="flex justify-center py-12">
+              <div className="relative w-10 h-10">
+                <div className="absolute inset-0 border-4 border-[#33ff9c]/10 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-transparent border-t-[#33ff9c] rounded-full animate-spin"></div>
+              </div>
             </div>
           ) : historyError ? (
             <div className="text-center py-8">
-              <div className="text-yellow-400 text-sm mb-2">
-                ⚠️ {historyError}
+              <div className="text-[#ffb020] text-sm mb-2 font-mono">
+                ⚠ {historyError}
               </div>
-              <p className="text-gray-500 text-xs">
-                History may be unavailable
+              <p className="text-[#5a6a63] text-xs">
+                Log may be unavailable right now.
               </p>
             </div>
           ) : history.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 text-sm">
-              No history found. Check a bill to start saving.
+            <div className="text-center py-12 text-[#5a6a63] text-sm font-mono">
+              No readings yet. Look up a meter to start logging.
             </div>
           ) : (
             <>
               <div className="mb-8">
                 <BillBarChart data={history} />
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-[#c9793c]/10">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-3 px-3 text-gray-400 font-medium tracking-wider">
+                    <tr className="border-b border-[#c9793c]/10 bg-[#050807]">
+                      <th className="text-left py-3 px-4 text-[#5a6a63] font-medium tracking-wider font-mono uppercase text-xs">
                         Date & Time
                       </th>
-                      <th className="text-right py-3 px-3 text-gray-400 font-medium tracking-wider">
+                      <th className="text-right py-3 px-4 text-[#5a6a63] font-medium tracking-wider font-mono uppercase text-xs">
                         Balance
                       </th>
                     </tr>
@@ -488,16 +510,16 @@ export default function Home() {
                     {history.map((item) => (
                       <tr
                         key={item._id}
-                        className="border-b border-white/5 hover:bg-white/5 transition"
+                        className="border-b border-[#c9793c]/5 hover:bg-[#c9793c]/5 transition-colors"
                       >
-                        <td className="py-3 px-3 text-gray-300 text-sm">
+                        <td className="py-3 px-4 text-[#9aab9f] text-sm font-mono">
                           {formatDate(item.checkedAt)}
                         </td>
                         <td
-                          className={`py-3 px-3 text-right font-semibold ${
+                          className={`py-3 px-4 text-right font-semibold font-mono ${
                             item.balance >= 0
-                              ? "text-green-400"
-                              : "text-red-400"
+                              ? "text-[#33ff9c]"
+                              : "text-[#ff5555]"
                           }`}
                         >
                           ৳ {item.balance.toFixed(2)}
